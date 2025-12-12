@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {useEffect, useState} from 'react'
 import './App.css'
+import {io, type Socket} from "socket.io-client";
+import type {ClientToServerEvents, ServerToClientEvents} from "./types.ts";
+import CodeEditor from "./CodeEditor.tsx";
+
+type TypeSocket = Socket<ServerToClientEvents , ClientToServerEvents>
+const socket: TypeSocket = io("http://localhost:3000");
+
+const TEST_ROOM_ID = "ts-collab-demo-2025"
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [initialCode, setInitialCode] = useState<string>('')
+    const [hasJoined, setHasJoined] = useState(false)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    useEffect(() => {
+        socket.emit('join-room', TEST_ROOM_ID, (code: string) => {
+            setInitialCode(code)
+            setHasJoined(true)
+        })
+
+        socket.on('user-joined', (userId) => {
+            console.log(`User ${userId} joined the room`)
+        })
+
+        return () => {
+            socket.off('user-joined')
+        }
+    })
+
+    return (
+        <div style={{ padding: '10px' }}>
+            <h1>TypeScript Collaborative Editor (Room: **{TEST_ROOM_ID}**)</h1>
+            {
+                hasJoined ? (
+                    <CodeEditor socket={socket} initialCode={initialCode} roomId={TEST_ROOM_ID} />
+                ) : (
+                    <p>Connecting to room...</p>
+                )
+            }
+        </div>
+    )
+
 }
 
 export default App
