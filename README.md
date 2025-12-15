@@ -2,6 +2,10 @@
 
 A real-time chat application built with React, TypeScript, Node.js, Express, and Socket.IO.
 
+## Preview
+
+![Chat Application Preview](Priview_img.png)
+
 ## Features
 
 ✨ **Real-time messaging** - Instant message delivery using WebSockets
@@ -38,7 +42,7 @@ A real-time chat application built with React, TypeScript, Node.js, Express, and
 1. **Clone the repository**
 
    ```bash
-   git clone <your-repo-url>
+   git clone <https://github.com/amliyanage/Live-Chat-Application-Using-React-And-Node.git>
    cd collaborative-editor
    ```
 
