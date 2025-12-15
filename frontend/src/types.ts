@@ -1,24 +1,32 @@
-export interface CodeChangePayload {
-    newCode: string;
-    roomId: string;
-    clientId: string;
+export interface Message {
+  id: string;
+  text: string;
+  userId: string;
+  username: string;
+  roomId: string;
+  timestamp: Date;
 }
 
-export interface RoomDocument {
-    _id: string;
-    roomId: string;
-    language: string;
-    createdAt: Date;
-    updatedAt: Date;
+export interface User {
+  id: string;
+  username: string;
 }
 
 export interface ClientToServerEvents {
-    'join-room': (roomId: string, callback: (initialCode: string) => void) => void;
-    'code-change': (payload: CodeChangePayload) => void;
+  "join-room": (
+    roomId: string,
+    username: string,
+    callback: (messages: Message[], users: User[]) => void
+  ) => void;
+  "send-message": (message: Omit<Message, "id" | "timestamp">) => void;
+  typing: (roomId: string, username: string) => void;
+  "stop-typing": (roomId: string, username: string) => void;
 }
 
 export interface ServerToClientEvents {
-    'code-update' : (payload: CodeChangePayload) => void;
-    'user-joined': (userId: string) => void;
-    'user-left': (userId: string) => void;
+  "message-received": (message: Message) => void;
+  "user-joined": (user: User) => void;
+  "user-left": (userId: string) => void;
+  "user-typing": (username: string) => void;
+  "user-stop-typing": (username: string) => void;
 }
